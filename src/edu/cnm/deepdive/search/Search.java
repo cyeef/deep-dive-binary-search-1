@@ -16,7 +16,7 @@ public class Search {
   private static final String READ_ERROR_MESSAGE_KEY = "haystackErrorMessage";
   private static final String FOUND_MESSAGE_KEY = "foundMessage";
   private static final String NOT_FOUND_MESSAGE_KEY = "notFoundMessage";
-  
+
   public static void main(String[] args) {
     try {
       ResourceBundle resources = getBundle(RESOURCE_BUNDLE_NAME);
@@ -24,18 +24,28 @@ public class Search {
       Integer[] haystack = readValues(resources);
       int foundPosition = findValue(needle, haystack);
       if (foundPosition >= 0) {
-        System.out.printf(resources.getString(FOUND_MESSAGE_KEY), 
-                          needle, foundPosition);
+        System.out.printf(resources.getString(FOUND_MESSAGE_KEY), needle, foundPosition);
       } else {
-        System.out.printf(resources.getString(NOT_FOUND_MESSAGE_KEY), 
-                          needle, ~foundPosition);        
+        System.out.printf(resources.getString(NOT_FOUND_MESSAGE_KEY), needle, ~foundPosition);
       }
     } catch (Exception ex) {
       // Do nothing.
     }
+
   }
 
-  private static int getSearchValue(String[] args, ResourceBundle resources) 
+  private static int count(int[] needles, Integer[] haystack) {
+    int counter = 0;
+    for (int c : needles) { // Loop through each character needle.
+      if (findValue(c, haystack) >= 0) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
+  // TODO Modify to read and return multiple values
+  private static int getSearchValue(String[] args, ResourceBundle resources)
       throws IllegalArgumentException, NumberFormatException, ArrayIndexOutOfBoundsException {
     try {
       int value = Integer.parseInt(args[0]);
@@ -45,31 +55,26 @@ public class Search {
       return value;
     } catch (NumberFormatException ex) {
       System.out.printf(resources.getString(PARSE_ERROR_MESSAGE_KEY));
-      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), 
-          Generator.class.getName());
+      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), Search.class.getName());
       throw ex;
     } catch (IllegalArgumentException ex) {
       System.out.printf(resources.getString(VALUE_ERROR_MESSAGE_KEY));
-      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), 
-          Generator.class.getName());
+      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), Search.class.getName());
       throw ex;
     } catch (ArrayIndexOutOfBoundsException ex) {
-      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), 
-          Generator.class.getName());
+      System.out.printf(resources.getString(USAGE_MESSAGE_KEY), Search.class.getName());
       throw ex;
     }
   }
-  
+
   private static ResourceBundle getBundle(String bundleName) {
     return ResourceBundle.getBundle(bundleName);
   }
 
-  private static Integer[] readValues(ResourceBundle resources) 
-      throws NumberFormatException, IOException {      
-    try (
-        InputStreamReader reader = new InputStreamReader(System.in);
-        BufferedReader buffer = new BufferedReader(reader);
-    ) {
+  private static Integer[] readValues(ResourceBundle resources)
+      throws NumberFormatException, IOException {
+    try (InputStreamReader reader = new InputStreamReader(System.in);
+        BufferedReader buffer = new BufferedReader(reader);) {
       List<Integer> data = new LinkedList<>();
       for (String line = buffer.readLine(); line != null; line = buffer.readLine()) {
         data.add(Integer.valueOf(line));
@@ -80,13 +85,12 @@ public class Search {
       throw ex;
     }
   }
-  
+
   private static int findValue(int needle, Integer[] haystack) {
     return findValue(needle, haystack, 0, haystack.length);
   }
-  
-  private static int findValue(int needle, Integer[] haystack, 
-      int start, int end) {
+
+  private static int findValue(int needle, Integer[] haystack, int start, int end) {
     if (end <= start) {
       return ~start;
     }
@@ -100,14 +104,7 @@ public class Search {
     }
     return findValue(needle, haystack, start, midpoint);
   }
-  
+
 }
-
-
-
-
-
-
-
 
 
